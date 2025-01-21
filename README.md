@@ -14,7 +14,7 @@ cd ImageHost
 ```
 
 ### 2. Install prerequisites
-Run these command in your terminal.
+Run this command in your terminal.
 ```
 npm install
 ```
@@ -88,6 +88,8 @@ Now it will give you 2 things, the site key and the secret key, fill both of the
 }
 ```
 
+### 5. Deploy
+
 Try to run your app locally using this command
 ```
 npm run start
@@ -106,6 +108,10 @@ After you run it, it will give you your final, production app link. Don't go to 
 And that's it! Enjoy!
 
 ## Contribution
+You can report bugs or suggest new issues in the Issues tab.
+And yes, my code is terrible. If you are nerdy, feel free to help me by submitting Pull Requests :D
+
+## Credits
 Thanks Cloudflare with it's wonderful and generous free plan, without it this might not be exist!
 
 And thanks ChatGPT to help me make this easier :D

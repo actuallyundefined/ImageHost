@@ -3,18 +3,16 @@ export default {
 	  const url = new URL(request.url);
 	  const port = url.port && !["80", "443"].includes(url.port) ? `:${url.port}` : "";
 	  const baseUrl = `${url.protocol}//${url.hostname}${port}`;
-	  const path = url.pathname.slice(1); // Remove the leading "/"
+	  const path = url.pathname.slice(1);
 	  const clientIp = request.headers.get("CF-Connecting-IP") || "unknown";
   
-	  // Turnstile keys
 	  const TURNSTILE_SECRET_KEY = env.TURNSTILE_SECRET_KEY;
   
-	  // Rate limit configuration
-	  const RATE_LIMIT = 5; // Number of requests allowed
-	  const RATE_LIMIT_WINDOW = 60; // Window in seconds
+	  const RATE_LIMIT = 5;
+	  const RATE_LIMIT_WINDOW = 60;
   
 	  async function isRateLimited(clientIp) {
-		const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+		const currentTime = Math.floor(Date.now() / 1000);
 		const key = `rate_limit:${clientIp}`;
   
 		const data = await env.RATE_LIMIT_KV.get(key, { type: "json" });
@@ -23,26 +21,24 @@ export default {
 		  const { count, timestamp } = data;
 		  if (currentTime - timestamp < RATE_LIMIT_WINDOW) {
 			if (count >= RATE_LIMIT) {
-			  return true; // Rate limit exceeded
+			  return true;
 			} else {
-			  // Increment the count
 			  await env.RATE_LIMIT_KV.put(
 				key,
 				JSON.stringify({ count: count + 1, timestamp }),
 				{ expirationTtl: RATE_LIMIT_WINDOW }
 			  );
-			  return false; // Still within the rate limit
+			  return false;
 			}
 		  }
 		}
   
-		// Create new rate limit record
 		await env.RATE_LIMIT_KV.put(
 		  key,
 		  JSON.stringify({ count: 1, timestamp: currentTime }),
 		  { expirationTtl: RATE_LIMIT_WINDOW }
 		);
-		return false; // No rate limit
+		return false;
 	  }
   
 	  async function validateTurnstile(token, remoteIp) {
@@ -58,10 +54,8 @@ export default {
 	  }
   
 	  if (request.method === "GET" && (path === "" || path === "script.js" || path === "style.css")) {
-		// Serve the local index.html file
 		return await env.ASSETS.fetch(request);
 	  } else if (request.method === "POST" && path === "") {
-		// Rate limit check
 		if (await isRateLimited(clientIp)) {
 		  return new Response(
 			JSON.stringify({ status: 429, message: "Rate limit exceeded. Please try again later." }),
@@ -69,12 +63,10 @@ export default {
 		  );
 		}
   
-		// Parse the form data
 		const formData = await request.formData();
 		const image = formData.get("image");
 		const turnstileToken = formData.get("cf-turnstile-response");
   
-		// Validate Turnstile token
 		const turnstileValid = await validateTurnstile(turnstileToken, clientIp);
 		if (!turnstileValid) {
 		  return new Response(
@@ -91,7 +83,7 @@ export default {
 		}
   
 		const extension = image.name.split(".").pop();
-		const randomId = crypto.randomUUID(); // Generate a random UUID
+		const randomId = crypto.randomUUID();
 		const key = `${randomId}.${extension}`;
   
 		await env.BUCKET.put(key, image.stream(), {
@@ -109,7 +101,6 @@ export default {
 			{ headers: { "Content-Type": "application/json" }, status: 200 }
 		);
 	  } else if (request.method === "GET") {
-		// Serve the image if it exists
 		const imageKey = path;
   
 		try {
@@ -133,7 +124,6 @@ export default {
 		  );
 		}
 	  } else {
-		// Method not allowed
 		return new Response(
 		  JSON.stringify({ status: 405, message: "Method not allowed." }),
 		  { headers: { "Content-Type": "application/json" }, status: 405 }
