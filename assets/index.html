@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+        <title>Instant Image Hosting</title>
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=_turnstileCb" async defer></script>
+        <link rel="stylesheet" href="./style.css">
+    </head>
+    <body>
+        <div class="card max-width">
+            <header class="card-header">
+                <p class="card-header-title" style="float: left;">Instant Image Hosting <a class="author" href="https://undefined.is-a.dev" target="_blank">by Undefined</a> </p>
+            </header>
+            <div class="card-content">
+                <div class="content">
+                    <p>An instant image hosting powered by Cloudflare Worker, 100% free!</p>
+                    <form id="upload-form" method="POST" enctype="multipart/form-data">
+                        <div class="my-5" id="drop-zone">
+                        </div>
+                        <div class="my-5" id="turnstile-widget">
+                        </div>
+                        <div class="my-5">
+                            <input class="button" type="submit" value="Submit" />
+                        </div>
+                    </form>
+                    <div id="success-message"></div>
+                </div>
+            </div>
+        </div>
+        <script>
+            function _turnstileCb() {
+                fetch("/turnstileSiteKey", {
+                    method: "GET"
+                })
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(data => {
+                        turnstile.render('#turnstile-widget', {
+                            sitekey: data.key,
+                            theme: 'dark',
+                        });
+                    })
+            }
+        </script>
+        <script src="./script.js"></script>
+    </body>
+</html>

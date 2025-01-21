@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "imagehost",
+  "main": "src/index.js",
+  "compatibility_date": "2025-01-21",
+  "observability": {
+    "enabled": true
+  },
+  "r2_buckets": [
+    {
+      "bucket_name": "imagedb",
+      "binding": "BUCKET"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "RATE_LIMIT_KV",
+      "id": "<YOUR_ID>"
+    }
+  ],
+  "vars": {
+    "TURNSTILE_SITE_KEY": "SITE_KEY",
+    "TURNSTILE_SECRET_KEY": "SECRET_KEY"
+  },
+  "assets": {
+    "directory": "./assets/",
+    "binding": "ASSETS",
+    "experimental_serve_directly": false
+  }
+}
